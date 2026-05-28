@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vishali's Hydration Reminder</title>
+    
+    <!-- Apple/iOS Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vishali Drips">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3105/3105803.png">
+
+    <!-- PWA Web Manifest (Android & Desktop) -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Vishali's%20Hydration%20Reminder%22%2C%22short_name%22%3A%22VishaliHydrates%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0fdfa%22%2C%22theme_color%22%3A%22%230ea5e9%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3105%2F3105803.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%23png%22%7D%5D%7D">
+    <meta name="theme-color" content="#0ea5e9">
+    
+    <!-- Tailwind & FontAwesome Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @keyframes wave {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-8px) scaleY(1.03); }
+        }
+        .animate-wave { animation: wave 4s ease-in-out infinite; }
+        
+        @keyframes slideUp {
+            0% { transform: translateY(120px); opacity: 0; }
+            8% { transform: translateY(0); opacity: 1; }
+            92% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(120px); opacity: 0; }
+        }
+        .toast-animation { animation: slideUp 5.5s ease-in-out forwards; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-sky-50 to-blue-100 min-h-screen font-sans flex flex-col items-center justify-between p-4 selection:bg-sky-200" onclick="unlockAudioContext()">
+
+    <!-- Header Grid -->
+    <header class="w-full max-w-md text-center pt-6 relative">
+        <!-- Sound Toggle Control -->
+        <button id="sound-btn" onclick="toggleMute(event)" class="absolute right-2 top-6 bg-white/80 backdrop-blur-sm text-sky-600 shadow-sm border border-sky-100 w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition">
+            <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+        </button>
+        
+        <h1 class="text-3xl font-extrabold text-sky-950 tracking-tight flex items-center justify-center gap-2 pr-6">
+            <i class="fa-solid fa-droplet text-sky-500 animate-bounce"></i> Vishali's Hydration
+        </h1>
+        <p class="text-sky-600 text-sm font-medium mt-1">Drink up and stay radiant! ✨</p>
+    </header>
+
+    <!-- Main Board -->
+    <main class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-sky-100 flex flex-col items-center space-y-5 my-auto">
+        
+        <!-- Interactive Water Animation -->
+        <div class="relative w-36 h-36 bg-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-inner animate-wave">
+            <i class="fa-solid fa-glass-water text-6xl text-sky-500"></i>
+        </div>
+
+        <!-- Timer Panel -->
+        <div class="text-center w-full">
+            <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Next Reminder In</p>
+            <p id="countdown" class="text-4xl font-mono font-black text-slate-700 mt-0.5">60:00</p>
+        </div>
+
+        <!-- Metric Tracker -->
+        <div class="bg-sky-50/60 rounded-2xl p-4 w-full text-center border border-sky-100/40">
+            <p class="text-sm font-semibold text-sky-800">Glasses Drank Today</p>
+            <div class="flex items-center justify-center gap-5 mt-2">
+                <button onclick="updateCount(-1, event)" class="w-9 h-9 rounded-full bg-white text-sky-600 shadow-sm border border-sky-100 font-bold active:scale-90 transition flex items-center justify-center">-</button>
+                <span id="glass-count" class="text-3xl font-black text-sky-950">0</span>
+                <button onclick="updateCount(1, event)" class="w-9 h-9 rounded-full bg-sky-600 text-white shadow-sm font-bold active:scale-90 transition flex items-center justify-center">+</button>
+            </div>
+        </div>
+
+        <!-- Control Area -->
+        <div class="w-full space-y-2">
+            <button id="noti-btn" onclick="requestNotificationPermission()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-bell"></i> Enable Hourly Reminders
+            </button>
+            
+            <button onclick="triggerTestReminder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2 px-4 rounded-xl transition text-xs flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-vial"></i> Test Notification, Sound & Toast
+            </button>
+        </div>
+
+        <!-- iOS Deployment Info Box -->
+        <div id="ios-tip" class="hidden text-left bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800 space-y-1">
+            <p class="font-bold"><i class="fa-solid fa-circle-info"></i> iPhone Setup Instruction:</p>
+            <p>Tap the <span class="font-bold">Share Button <i class="fa-solid fa-share-from-square"></i></span> below in Safari, then select <span class="font-bold">"Add to Home Screen"</span>. Open that installed version to receive alerts backgrounded!</p>
+        </div>
+
+    </main>
+
+    <!-- App Branding Signature -->
+    <footer class="w-full max-w-md text-center pb-4 text-xs text-sky-400 font-medium">
+        Made with ❤️ for Vishali
+    </footer>
+
+    <!-- Toast Layer -->
+    <div id="toast-container" class="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-sm z-50 pointer-events-none"></div>
+
+    <script>
+        // --- ADAPTIVE TEXT CONFIGURATIONS ---
+        const personalizedToasts = [
+            "Drink up, beautiful Vishali! Keep that glow going. ✨",
+            "Time for a water break, Vishali! Your resident engineer orders you to hydrate. 💻❤️",
+            "Hydration check, Vishali! Sending you a massive hug with this glass of water. 🤗💧",
+            "A healthy fiancée is a happy fiancée! Take a big sip, Vishali. 🥂",
+            "Just your hourly reminder that you are incredibly loved, Vishali... now go drink water! 🥰",
+            "Hey Vishali, pause whatever you are doing and take 3 big gulps right now! 🕒",
+            "Your skin and energy levels will thank you for this sip, Vishali! 💫"
+        ];
+
+        let timerMinutes = 60;
+        let timeRemaining = timerMinutes * 60;
+        let glassCount = parseInt(localStorage.getItem('glassCount')) || 0;
+        let countdownInterval;
+        
+        // Audio State Engine
+        let audioCtx = null;
+        let isMuted = localStorage.getItem('appMuted') === 'true';
+
+        document.getElementById('glass-count').innerText = glassCount;
+        updateMuteUI();
+
+        // Detect device platform for explicit UX updates
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        
+        if (isIOS && !isStandalone) {
+            document.getElementById('ios-tip').classList.remove('hidden');
+        }
+
+        // --- NATIVE AUDIO SYNTHESIZER (Web Audio API) ---
+        function unlockAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playDropletChime() {
+            if (isMuted) return;
+            unlockAudioContext();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            
+            // First Pitch (Low bubble base)
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now); // C5 node
+            osc1.frequency.exponentialRampToValueAtTime(1174.66, now + 0.12); // Ramp up to D6 for droplet pop
+            
+            gain1.gain.setValueAtTime(0.25, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.3);
+
+            // Second Layer (High crystal shimmer resonance)
+            setTimeout(() => {
+                if (isMuted) return;
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1318.51, audioCtx.currentTime); // E6
+                gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start();
+                osc2.stop(audioCtx.currentTime + 0.2);
+            }, 80);
+        }
+
+        function toggleMute(e) {
+            e.stopPropagation(); // Stop general layout click triggers
+            isMuted = !isMuted;
+            localStorage.setItem('appMuted', isMuted);
+            updateMuteUI();
+            if(!isMuted) playDropletChime();
+        }
+
+        function updateMuteUI() {
+            const icon = document.getElementById('sound-icon');
+            if (isMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-rose-500";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-emerald-500";
+            }
+        }
+
+        // --- TIMER ENGINE ---
+        function startTimer() {
+            clearInterval(countdownInterval);
+            timeRemaining = timerMinutes * 60;
+            
+            countdownInterval = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    triggerReminder();
+                    timeRemaining = timerMinutes * 60;
+                }
+                timeRemaining--;
+                displayTime();
+            }, 1000);
+        }
+
+        function displayTime() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('countdown').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateCount(val, e) {
+            if(e) e.stopPropagation();
+            glassCount = Math.max(0, glassCount + val);
+            localStorage.setItem('glassCount', glassCount);
+            document.getElementById('glass-count').innerText = glassCount;
+            
+            if(val > 0) {
+                playDropletChime();
+                showPersonalizedToast("Amazing job staying on track, Vishali! 🎉");
+            }
+        }
+
+        // --- APPARATUS ALERT SYSTEMS ---
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('Push Notification APIs are turned off or unsupported on this device.');
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                updateNotificationButton(permission);
+                if (permission === 'granted') {
+                    playDropletChime();
+                    showPersonalizedToast("Woohoo! Notifications are active, Vishali. 🔔");
+                }
+            });
+        }
+
+        function updateNotificationButton(permission) {
+            const btn = document.getElementById('noti-btn');
+            if (permission === 'granted') {
+                btn.className = "w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-md pointer-events-none flex items-center justify-center gap-2 text-sm";
+                btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Reminders Active`;
+            } else if (permission === 'denied') {
+                btn.className = "w-full bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-md text-sm";
+                btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Notifications Blocked`;
+            }
+        }
+
+        function showPersonalizedToast(forcedMessage = null) {
+            const container = document.getElementById('toast-container');
+            const message = forcedMessage || personalizedToasts[Math.floor(Math.random() * personalizedToasts.length)];
+            
+            const toast = document.createElement('div');
+            toast.className = "toast-animation bg-slate-900 text-white font-medium p-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800 pointer-events-auto mb-3 text-sm";
+            toast.innerHTML = `
+                <div class="bg-sky-500 p-2 rounded-xl text-white">
+                    <i class="fa-solid fa-heart animate-pulse"></i>
+                </div>
+                <div>${message}</div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 5500);
+        }
+
+        function triggerReminder() {
+            showPersonalizedToast();
+            playDropletChime();
+            executeNativePush();
+        }
+
+        function triggerTestReminder() {
+            showPersonalizedToast();
+            playDropletChime();
+            executeNativePush("Test Alert! 💧", "Hey Vishali! Your notifications work successfully.");
+        }
+
+        function executeNativePush(title = "Time to Drink Water, Vishali! 💧", body = "Take a break, stretch, and finish a fresh glass of water right now.") {
+            if (Notification.permission === "granted") {
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification(title, {
+                            body: body,
+                            icon: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png",
+                            badge: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png"
+                        });
+                    });
+                } else {
+                    new Notification(title, { body: body, icon: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png" });
+                }
+            }
+        }
+
+        // --- LIFECYCLE SERVICE WORKER ---
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.error(err));
+        }
+
+        // Bootstrapping Engine
+        startTimer();
+        displayTime();
+    </script>
+</body>
+</html>
