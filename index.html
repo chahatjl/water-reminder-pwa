@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vishali's Hydration Reminder</title>
     
-    <!-- Apple/iOS Web App Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vishali Drips">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3105/3105803.png">
 
-    <!-- PWA Web Manifest (Android & Desktop) -->
     <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Vishali's%20Hydration%20Reminder%22%2C%22short_name%22%3A%22VishaliHydrates%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0fdfa%22%2C%22theme_color%22%3A%22%230ea5e9%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3105%2F3105803.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%23png%22%7D%5D%7D">
     <meta name="theme-color" content="#0ea5e9">
     
-    <!-- Tailwind & FontAwesome Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -37,9 +34,7 @@
 </head>
 <body class="bg-gradient-to-br from-sky-50 to-blue-100 min-h-screen font-sans flex flex-col items-center justify-between p-4 selection:bg-sky-200" onclick="unlockAudioContext()">
 
-    <!-- Header Grid -->
     <header class="w-full max-w-md text-center pt-6 relative">
-        <!-- Sound Toggle Control -->
         <button id="sound-btn" onclick="toggleMute(event)" class="absolute right-2 top-6 bg-white/80 backdrop-blur-sm text-sky-600 shadow-sm border border-sky-100 w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition">
             <i id="sound-icon" class="fa-solid fa-volume-high"></i>
         </button>
@@ -50,21 +45,21 @@
         <p class="text-sky-600 text-sm font-medium mt-1">Drink up and stay radiant! ✨</p>
     </header>
 
-    <!-- Main Board -->
     <main class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-sky-100 flex flex-col items-center space-y-5 my-auto">
         
-        <!-- Interactive Water Animation -->
         <div class="relative w-36 h-36 bg-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-inner animate-wave">
             <i class="fa-solid fa-glass-water text-6xl text-sky-500"></i>
         </div>
 
-        <!-- Timer Panel -->
         <div class="text-center w-full">
             <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Next Reminder In</p>
             <p id="countdown" class="text-4xl font-mono font-black text-slate-700 mt-0.5">60:00</p>
         </div>
 
-        <!-- Metric Tracker -->
+        <button id="silence-btn" onclick="stopLongAlarm(event)" class="hidden w-full bg-rose-500 hover:bg-rose-600 text-white font-black py-4 px-4 rounded-2xl shadow-lg transition animate-pulse flex items-center justify-center gap-2 text-base">
+            <i class="fa-solid fa-circle-stop text-xl"></i> Silence Alarm, Vishali! 🌸
+        </button>
+
         <div class="bg-sky-50/60 rounded-2xl p-4 w-full text-center border border-sky-100/40">
             <p class="text-sm font-semibold text-sky-800">Glasses Drank Today</p>
             <div class="flex items-center justify-center gap-5 mt-2">
@@ -74,18 +69,16 @@
             </div>
         </div>
 
-        <!-- Control Area -->
         <div class="w-full space-y-2">
             <button id="noti-btn" onclick="requestNotificationPermission()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
                 <i class="fa-solid fa-bell"></i> Enable Hourly Reminders
             </button>
             
             <button onclick="triggerTestReminder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2 px-4 rounded-xl transition text-xs flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-vial"></i> Test Notification, Sound & Toast
+                <i class="fa-solid fa-vial"></i> Test 1-Min Sound & Alerts
             </button>
         </div>
 
-        <!-- iOS Deployment Info Box -->
         <div id="ios-tip" class="hidden text-left bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800 space-y-1">
             <p class="font-bold"><i class="fa-solid fa-circle-info"></i> iPhone Setup Instruction:</p>
             <p>Tap the <span class="font-bold">Share Button <i class="fa-solid fa-share-from-square"></i></span> below in Safari, then select <span class="font-bold">"Add to Home Screen"</span>. Open that installed version to receive alerts backgrounded!</p>
@@ -93,12 +86,10 @@
 
     </main>
 
-    <!-- App Branding Signature -->
     <footer class="w-full max-w-md text-center pb-4 text-xs text-sky-400 font-medium">
         Made with ❤️ for Vishali
     </footer>
 
-    <!-- Toast Layer -->
     <div id="toast-container" class="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-sm z-50 pointer-events-none"></div>
 
     <script>
@@ -118,14 +109,15 @@
         let glassCount = parseInt(localStorage.getItem('glassCount')) || 0;
         let countdownInterval;
         
-        // Audio State Engine
+        // Audio & Continuous Alarm Management Handles
         let audioCtx = null;
         let isMuted = localStorage.getItem('appMuted') === 'true';
+        let alarmIntervalId = null;
+        let alarmTimeoutId = null;
 
         document.getElementById('glass-count').innerText = glassCount;
         updateMuteUI();
 
-        // Detect device platform for explicit UX updates
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
         
@@ -133,7 +125,7 @@
             document.getElementById('ios-tip').classList.remove('hidden');
         }
 
-        // --- NATIVE AUDIO SYNTHESIZER (Web Audio API) ---
+        // --- NATIVE AUDIO SYNTHESIZER ---
         function unlockAudioContext() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -143,51 +135,77 @@
             }
         }
 
+        // Single chime burst node
         function playDropletChime() {
             if (isMuted) return;
             unlockAudioContext();
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            
-            // First Pitch (Low bubble base)
-            const osc1 = audioCtx.createOscillator();
+            const osc1 = audioCtx.createOscWorkspace || audioCtx.createOscillator();
             const gain1 = audioCtx.createGain();
             osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(523.25, now); // C5 node
-            osc1.frequency.exponentialRampToValueAtTime(1174.66, now + 0.12); // Ramp up to D6 for droplet pop
+            osc1.frequency.setValueAtTime(587.33, now); // D5
+            osc1.frequency.exponentialRampToValueAtTime(1318.51, now + 0.1); // E6 drop pop Effect
             
-            gain1.gain.setValueAtTime(0.25, now);
+            gain1.gain.setValueAtTime(0.2, now);
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             
             osc1.connect(gain1);
             gain1.connect(audioCtx.destination);
             osc1.start(now);
             osc1.stop(now + 0.3);
+        }
 
-            // Second Layer (High crystal shimmer resonance)
-            setTimeout(() => {
-                if (isMuted) return;
-                const osc2 = audioCtx.createOscillator();
-                const gain2 = audioCtx.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(1318.51, audioCtx.currentTime); // E6
-                gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-                
-                osc2.connect(gain2);
-                gain2.connect(audioCtx.destination);
-                osc2.start();
-                osc2.stop(audioCtx.currentTime + 0.2);
-            }, 80);
+        // --- 1-MINUTE LOOP CONTROLLERS ---
+        function startLongAlarm() {
+            if (isMuted) return;
+            
+            // Clear any lingering alarms just in case
+            stopLongAlarm();
+
+            // Reveal the prominent pause/silence button UI element
+            document.getElementById('silence-btn').classList.remove('hidden');
+
+            // Play instantly, then loop every 2 seconds
+            playDropletChime();
+            alarmIntervalId = setInterval(() => {
+                playDropletChime();
+            }, 2000);
+
+            // Safety net: Automatically turn off the sound after 60 seconds (1 minute)
+            alarmTimeoutId = setTimeout(() => {
+                stopLongAlarm();
+            }, 60000);
+        }
+
+        function stopLongAlarm(e) {
+            if(e) e.stopPropagation();
+            
+            // Clear loop intervals and timers
+            if (alarmIntervalId) {
+                clearInterval(alarmIntervalId);
+                alarmIntervalId = null;
+            }
+            if (alarmTimeoutId) {
+                clearTimeout(alarmTimeoutId);
+                alarmTimeoutId = null;
+            }
+
+            // Hide the pause button UI element
+            document.getElementById('silence-btn').classList.add('hidden');
         }
 
         function toggleMute(e) {
-            e.stopPropagation(); // Stop general layout click triggers
+            e.stopPropagation();
             isMuted = !isMuted;
             localStorage.setItem('appMuted', isMuted);
             updateMuteUI();
-            if(!isMuted) playDropletChime();
+            if (isMuted) {
+                stopLongAlarm();
+            } else {
+                playDropletChime();
+            }
         }
 
         function updateMuteUI() {
@@ -228,12 +246,13 @@
             document.getElementById('glass-count').innerText = glassCount;
             
             if(val > 0) {
+                stopLongAlarm(); // Auto-stop the alarm if she logs a glass!
                 playDropletChime();
                 showPersonalizedToast("Amazing job staying on track, Vishali! 🎉");
             }
         }
 
-        // --- APPARATUS ALERT SYSTEMS ---
+        // --- NOTIFICATIONS & TOAST PANELS ---
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
                 alert('Push Notification APIs are turned off or unsupported on this device.');
@@ -277,14 +296,14 @@
 
         function triggerReminder() {
             showPersonalizedToast();
-            playDropletChime();
+            startLongAlarm();
             executeNativePush();
         }
 
         function triggerTestReminder() {
             showPersonalizedToast();
-            playDropletChime();
-            executeNativePush("Test Alert! 💧", "Hey Vishali! Your notifications work successfully.");
+            startLongAlarm();
+            executeNativePush("Test Alarm Loop! 💧", "Hey Vishali! Testing the 1-minute audio track loop.");
         }
 
         function executeNativePush(title = "Time to Drink Water, Vishali! 💧", body = "Take a break, stretch, and finish a fresh glass of water right now.") {
