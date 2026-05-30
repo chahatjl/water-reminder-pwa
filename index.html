@@ -47,6 +47,13 @@
 
     <main class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-sky-100 flex flex-col items-center space-y-5 my-auto">
         
+        <div class="w-full flex items-center justify-between bg-sky-50/40 border border-sky-100/60 rounded-xl px-4 py-2 text-xs">
+            <span class="font-bold text-sky-900"><i class="fa-solid fa-desktop"></i> Desk Mode (Keep Screen On)</span>
+            <button id="wake-lock-btn" onclick="toggleWakeLock(event)" class="bg-slate-200 text-slate-600 font-bold px-3 py-1 rounded-lg transition active:scale-95">
+                OFF
+            </button>
+        </div>
+
         <div class="relative w-36 h-36 bg-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-inner animate-wave">
             <i class="fa-solid fa-glass-water text-6xl text-sky-500"></i>
         </div>
@@ -104,16 +111,15 @@
             "Your skin and energy levels will thank you for this sip, Vishali! 💫"
         ];
 
-        let timerMinutes = 60;
-        let timeRemaining = timerMinutes * 60;
+        const TIMER_MINUTES = 60;
         let glassCount = parseInt(localStorage.getItem('glassCount')) || 0;
-        let countdownInterval;
+        let clockIntervalId = null;
         
-        // Audio & Continuous Alarm Management Handles
         let audioCtx = null;
         let isMuted = localStorage.getItem('appMuted') === 'true';
         let alarmIntervalId = null;
         let alarmTimeoutId = null;
+        let wakeLock = null;
 
         document.getElementById('glass-count').innerText = glassCount;
         updateMuteUI();
@@ -135,18 +141,17 @@
             }
         }
 
-        // Single chime burst node
         function playDropletChime() {
             if (isMuted) return;
             unlockAudioContext();
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            const osc1 = audioCtx.createOscWorkspace || audioCtx.createOscillator();
+            const osc1 = audioCtx.createOscillator();
             const gain1 = audioCtx.createGain();
             osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(587.33, now); // D5
-            osc1.frequency.exponentialRampToValueAtTime(1318.51, now + 0.1); // E6 drop pop Effect
+            osc1.frequency.setValueAtTime(587.33, now); 
+            osc1.frequency.exponentialRampToValueAtTime(1318.51, now + 0.1); 
             
             gain1.gain.setValueAtTime(0.2, now);
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
@@ -157,42 +162,19 @@
             osc1.stop(now + 0.3);
         }
 
-        // --- 1-MINUTE LOOP CONTROLLERS ---
         function startLongAlarm() {
             if (isMuted) return;
-            
-            // Clear any lingering alarms just in case
             stopLongAlarm();
-
-            // Reveal the prominent pause/silence button UI element
             document.getElementById('silence-btn').classList.remove('hidden');
-
-            // Play instantly, then loop every 2 seconds
             playDropletChime();
-            alarmIntervalId = setInterval(() => {
-                playDropletChime();
-            }, 2000);
-
-            // Safety net: Automatically turn off the sound after 60 seconds (1 minute)
-            alarmTimeoutId = setTimeout(() => {
-                stopLongAlarm();
-            }, 60000);
+            alarmIntervalId = setInterval(() => { playDropletChime(); }, 2000);
+            alarmTimeoutId = setTimeout(() => { stopLongAlarm(); }, 60000);
         }
 
         function stopLongAlarm(e) {
             if(e) e.stopPropagation();
-            
-            // Clear loop intervals and timers
-            if (alarmIntervalId) {
-                clearInterval(alarmIntervalId);
-                alarmIntervalId = null;
-            }
-            if (alarmTimeoutId) {
-                clearTimeout(alarmTimeoutId);
-                alarmTimeoutId = null;
-            }
-
-            // Hide the pause button UI element
+            if (alarmIntervalId) { clearInterval(alarmIntervalId); alarmIntervalId = null; }
+            if (alarmTimeoutId) { clearTimeout(alarmTimeoutId); alarmTimeoutId = null; }
             document.getElementById('silence-btn').classList.add('hidden');
         }
 
@@ -201,43 +183,97 @@
             isMuted = !isMuted;
             localStorage.setItem('appMuted', isMuted);
             updateMuteUI();
-            if (isMuted) {
-                stopLongAlarm();
-            } else {
-                playDropletChime();
-            }
+            if (isMuted) stopLongAlarm(); else playDropletChime();
         }
 
         function updateMuteUI() {
             const icon = document.getElementById('sound-icon');
-            if (isMuted) {
-                icon.className = "fa-solid fa-volume-xmark text-rose-500";
+            icon.className = isMuted ? "fa-solid fa-volume-xmark text-rose-500" : "fa-solid fa-volume-high text-emerald-500";
+        }
+
+        // --- SCREEN WAKE LOCK ENGINE (Desk Mode) ---
+        async function toggleWakeLock(e) {
+            if(e) e.stopPropagation();
+            const btn = document.getElementById('wake-lock-btn');
+            
+            if (wakeLock !== null) {
+                // Turn Off Lock
+                await wakeLock.release();
+                wakeLock = null;
+                btn.className = "bg-slate-200 text-slate-600 font-bold px-3 py-1 rounded-lg transition active:scale-95";
+                btn.innerText = "OFF";
+                showPersonalizedToast("Desk Mode disabled. Screen will sleep normally.");
             } else {
-                icon.className = "fa-solid fa-volume-high text-emerald-500";
+                // Turn On Lock
+                try {
+                    if ('wakeLock' in navigator) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                        btn.className = "bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow-sm animate-pulse";
+                        btn.innerText = "ON";
+                        showPersonalizedToast("Desk Mode active! Your screen will stay awake. ☀️");
+                        
+                        // Handle unexpected OS releases
+                        wakeLock.addEventListener('release', () => {
+                            if(wakeLock === null) return;
+                            btn.className = "bg-slate-200 text-slate-600 font-bold px-3 py-1 rounded-lg transition";
+                            btn.innerText = "OFF";
+                            wakeLock = null;
+                        });
+                    } else {
+                        alert("Screen Wake Lock is not fully supported on this specific browser configuration.");
+                    }
+                } catch (err) {
+                    console.error(`Wake Lock failed: ${err.message}`);
+                }
             }
         }
 
-        // --- TIMER ENGINE ---
-        function startTimer() {
-            clearInterval(countdownInterval);
-            timeRemaining = timerMinutes * 60;
-            
-            countdownInterval = setInterval(() => {
-                if (timeRemaining <= 0) {
-                    triggerReminder();
-                    timeRemaining = timerMinutes * 60;
-                }
-                timeRemaining--;
-                displayTime();
-            }, 1000);
+        // --- REAL-WORLD TIME ENGINE ---
+        function setNextTargetTime() {
+            const targetTimestamp = Date.now() + (TIMER_MINUTES * 60 * 1000);
+            localStorage.setItem('hydrationTargetTime', targetTimestamp);
         }
 
-        function displayTime() {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
+        function syncUI() {
+            const now = Date.now();
+            const target = parseInt(localStorage.getItem('hydrationTargetTime') || now);
+            const timeLeftMs = target - now;
+
+            if (timeLeftMs <= 0) {
+                triggerReminder();
+                setNextTargetTime();
+                const newTarget = parseInt(localStorage.getItem('hydrationTargetTime'));
+                updateVisualCountdown(newTarget - now);
+            } else {
+                updateVisualCountdown(timeLeftMs);
+            }
+        }
+
+        function runClockEngine() {
+            if (clockIntervalId) clearInterval(clockIntervalId);
+            if (!localStorage.getItem('hydrationTargetTime')) {
+                setNextTargetTime();
+            }
+            
+            // Execute synchronization immediately to kill background tab lag
+            syncUI();
+            clockIntervalId = setInterval(() => { syncUI(); }, 1000);
+        }
+
+        function updateVisualCountdown(ms) {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
             document.getElementById('countdown').innerText = 
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
+
+        // Catch background tab resume events instantly
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                syncUI();
+            }
+        });
 
         function updateCount(val, e) {
             if(e) e.stopPropagation();
@@ -246,16 +282,18 @@
             document.getElementById('glass-count').innerText = glassCount;
             
             if(val > 0) {
-                stopLongAlarm(); // Auto-stop the alarm if she logs a glass!
+                stopLongAlarm();
+                setNextTargetTime(); 
+                syncUI();
                 playDropletChime();
                 showPersonalizedToast("Amazing job staying on track, Vishali! 🎉");
             }
         }
 
-        // --- NOTIFICATIONS & TOAST PANELS ---
+        // --- SYSTEM REMINDER ENGINE ---
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
-                alert('Push Notification APIs are turned off or unsupported on this device.');
+                alert('Notification APIs are turned off or unsupported on this device.');
                 return;
             }
             Notification.requestPermission().then(permission => {
@@ -334,9 +372,8 @@
             navigator.serviceWorker.register(swUrl).catch(err => console.error(err));
         }
 
-        // Bootstrapping Engine
-        startTimer();
-        displayTime();
+        // Initialization
+        runClockEngine();
     </script>
 </body>
 </html>
