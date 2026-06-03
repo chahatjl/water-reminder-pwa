@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vishali's Hydration Reminder</title>
+    <title>Vishali's Hydration Companion</title>
     
+    <!-- Apple/iOS Web App System Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vishali Drips">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3105/3105803.png">
 
+    <!-- PWA Web Manifest Configuration -->
     <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Vishali's%20Hydration%20Reminder%22%2C%22short_name%22%3A%22VishaliHydrates%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0fdfa%22%2C%22theme_color%22%3A%22%230ea5e9%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3105%2F3105803.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%23png%22%7D%5D%7D">
     <meta name="theme-color" content="#0ea5e9">
     
+    <!-- Design & Typography Engines -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         @keyframes wave {
-            0%, 100 { transform: translateY(0) scaleY(1); }
-            50% { transform: translateY(-8px) scaleY(1.03); }
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-6px) scaleY(1.02); }
         }
         .animate-wave { animation: wave 4s ease-in-out infinite; }
         
@@ -34,85 +37,90 @@
 </head>
 <body class="bg-gradient-to-br from-sky-50 to-blue-100 min-h-screen font-sans flex flex-col items-center justify-between p-4 selection:bg-sky-200" onclick="unlockAudioContext()">
 
-    <header class="w-full max-w-md text-center pt-6 relative">
-        <button id="sound-btn" onclick="toggleMute(event)" class="absolute right-2 top-6 bg-white/80 backdrop-blur-sm text-sky-600 shadow-sm border border-sky-100 w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition">
+    <!-- App Bar -->
+    <header class="w-full max-w-md text-center pt-4 relative">
+        <button id="sound-btn" onclick="toggleMute(event)" class="absolute right-2 top-4 bg-white/80 backdrop-blur-sm text-sky-600 shadow-sm border border-sky-100 w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition">
             <i id="sound-icon" class="fa-solid fa-volume-high"></i>
         </button>
         
-        <h1 class="text-3xl font-extrabold text-sky-950 tracking-tight flex items-center justify-center gap-2 pr-6">
+        <h1 class="text-2xl font-black text-sky-950 tracking-tight flex items-center justify-center gap-2 pr-6">
             <i class="fa-solid fa-droplet text-sky-500 animate-bounce"></i> Vishali's Hydration
         </h1>
-        <p class="text-sky-600 text-sm font-medium mt-1">Drink up and stay radiant! ✨</p>
     </header>
 
-    <main class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-sky-100 flex flex-col items-center space-y-4 my-auto">
+    <!-- Main Deck -->
+    <main class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-5 shadow-xl border border-sky-100 flex flex-col items-center space-y-4 my-auto">
         
-        <div class="w-full flex items-center justify-between bg-sky-50/40 border border-sky-100/60 rounded-xl px-4 py-2 text-xs">
-            <span class="font-bold text-sky-900"><i class="fa-solid fa-desktop"></i> Desk Mode (Keep Screen On)</span>
-            <button id="wake-lock-btn" onclick="toggleWakeLock(event)" class="bg-slate-200 text-slate-600 font-bold px-3 py-1 rounded-lg transition active:scale-95">
-                OFF
-            </button>
-        </div>
-
-        <div class="w-full bg-white/90 border border-sky-100 rounded-2xl p-3 flex flex-col items-center space-y-1.5 shadow-sm">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Reminder Interval</span>
-            <div class="flex items-center justify-center gap-4">
-                <button onclick="changeInterval(-5, event)" class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 shadow-inner font-bold active:scale-90 transition">-5m</button>
-                <div class="text-center min-w-[100px]">
-                    <span id="interval-display" class="text-2xl font-black text-sky-950">60</span>
-                    <span class="text-xs font-bold text-sky-600/80">mins</span>
+        <!-- Interactive Timer Control Deck -->
+        <div class="w-full bg-white/90 border border-sky-100 rounded-2xl p-3 flex flex-col items-center space-y-1 shadow-sm">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Set Alert Frequency</span>
+            <div class="flex items-center justify-center gap-5">
+                <button onclick="adjustInterval(-5, event)" class="w-10 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-90 transition flex items-center justify-center gap-0.5 text-xs">
+                    -5m
+                </button>
+                <div class="text-center min-w-[90px]">
+                    <span id="interval-display" class="text-3xl font-black text-sky-950">60</span>
+                    <span class="text-xs font-bold text-sky-600 block -mt-1">minutes</span>
                 </div>
-                <button onclick="changeInterval(5, event)" class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 shadow-inner font-bold active:scale-90 transition">+5m</button>
+                <button onclick="adjustInterval(5, event)" class="w-10 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-90 transition flex items-center justify-center gap-0.5 text-xs">
+                    +5m
+                </button>
             </div>
         </div>
 
-        <div class="relative w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-inner animate-wave">
+        <!-- Center Fluid Display -->
+        <div class="relative w-28 h-28 bg-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-inner animate-wave">
             <i class="fa-solid fa-glass-water text-5xl text-sky-500"></i>
         </div>
 
+        <!-- Live Clock Matrix -->
         <div class="text-center w-full">
-            <p class="text-xs uppercase tracking-wider text-slate-400 font-bold">Next Reminder In</p>
-            <p id="countdown" class="text-4xl font-mono font-black text-slate-700 mt-0.5">60:00</p>
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Countdown Intercept</p>
+            <p id="countdown" class="text-4xl font-mono font-black text-slate-700 tracking-tight mt-0.5">60:00</p>
         </div>
 
-        <button id="silence-btn" onclick="stopLongAlarm(event)" class="hidden w-full bg-rose-500 hover:bg-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg transition animate-pulse flex items-center justify-center gap-2 text-base">
-            <i class="fa-solid fa-circle-stop text-xl"></i> Silence Alarm, Vishali! 🌸
+        <!-- System Reset Execution Button -->
+        <button id="silence-btn" onclick="stopLongAlarm(event)" class="hidden w-full bg-rose-500 hover:bg-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg transition animate-pulse flex items-center justify-center gap-2 text-sm">
+            <i class="fa-solid fa-circle-stop text-lg"></i> Stop Alarm Notification, Vishali!
         </button>
 
-        <div class="bg-sky-50/60 rounded-2xl p-3.5 w-full text-center border border-sky-100/40">
-            <p class="text-xs font-bold uppercase tracking-wider text-sky-800">Glasses Drank Today</p>
-            <div class="flex items-center justify-center gap-5 mt-1.5">
-                <button onclick="updateCount(-1, event)" class="w-9 h-9 rounded-full bg-white text-sky-600 shadow-sm border border-sky-100 font-bold active:scale-90 transition flex items-center justify-center">-</button>
+        <!-- Metrics Dashboard -->
+        <div class="bg-sky-50/60 rounded-2xl p-3 w-full text-center border border-sky-100/40">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-sky-800">Target Volume Log</p>
+            <div class="flex items-center justify-center gap-6 mt-1">
+                <button onclick="updateCount(-1, event)" class="w-9 h-9 rounded-full bg-white text-sky-600 shadow-sm border border-sky-100 font-bold active:scale-90 transition flex items-center justify-center text-lg">-</button>
                 <span id="glass-count" class="text-3xl font-black text-sky-950">0</span>
-                <button onclick="updateCount(1, event)" class="w-9 h-9 rounded-full bg-sky-600 text-white shadow-sm font-bold active:scale-90 transition flex items-center justify-center">+</button>
+                <button onclick="updateCount(1, event)" class="w-9 h-9 rounded-full bg-sky-600 text-white shadow-sm font-bold active:scale-90 transition flex items-center justify-center text-lg">+</button>
             </div>
         </div>
 
+        <!-- Security Permission Controllers -->
         <div class="w-full space-y-1.5">
-            <button id="noti-btn" onclick="requestNotificationPermission()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
-                <i class="fa-solid fa-bell"></i> Enable System Push Notifications
+            <button id="noti-btn" onclick="requestNotificationPermission()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+                <i class="fa-solid fa-bell"></i> Authorize Background Push Engine
             </button>
             
-            <button onclick="triggerTestReminder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2 px-4 rounded-xl transition text-xs flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-vial"></i> Test Push Notification & Vibration
+            <button onclick="triggerTestReminder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2 px-4 rounded-xl transition text-[11px] flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-vial"></i> Run System Test (Push & Vibrate)
             </button>
         </div>
 
-        <div id="ios-tip" class="hidden text-left bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800 space-y-1">
-            <p class="font-bold"><i class="fa-solid fa-circle-info"></i> iPhone System Requirement:</p>
-            <p>Tap <span class="font-bold">Share <i class="fa-solid fa-share-from-square"></i></span> in Safari, then select <span class="font-bold">"Add to Home Screen"</span>. You must open that home-screen app to receive push alerts when minimized!</p>
+        <!-- iOS Hardware Trap Warning Box -->
+        <div id="ios-tip" class="hidden text-left bg-blue-50 border border-blue-200 rounded-xl p-3 text-[11px] text-blue-800 space-y-1">
+            <p class="font-bold"><i class="fa-solid fa-circle-info"></i> iPhone Deployment Requirement:</p>
+            <p>Tap <span class="font-bold">Share <i class="fa-solid fa-share-from-square"></i></span>, then choose <span class="font-bold">"Add to Home Screen"</span>. Launch that icon to activate background execution routines.</p>
         </div>
 
     </main>
 
-    <footer class="w-full max-w-md text-center pb-4 text-xs text-sky-400 font-medium">
-        Made with ❤️ for Vishali
+    <footer class="w-full max-w-md text-center pb-2 text-[10px] text-sky-400 font-medium tracking-wide">
+        ENGINEERED WITH ❤️ FOR VISHALI
     </footer>
 
+    <!-- Haptic Custom Toast Stack -->
     <div id="toast-container" class="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-sm z-50 pointer-events-none"></div>
 
     <script>
-        // --- CUSTOM MESSAGING ARRAY ---
         const personalizedToasts = [
             "Drink up, beautiful Vishali! Keep that glow going. ✨",
             "Time for a water break, Vishali! Your resident engineer orders you to hydrate. 💻❤️",
@@ -123,19 +131,16 @@
             "Your skin and energy levels will thank you for this sip, Vishali! 💫"
         ];
 
-        // Core Configuration Matrix
+        // System Constants & Registers
         let reminderIntervalMins = parseInt(localStorage.getItem('reminderIntervalMins')) || 60;
         let glassCount = parseInt(localStorage.getItem('glassCount')) || 0;
         let clockIntervalId = null;
         
-        // System Audio / Vibration Context State Engines
         let audioCtx = null;
         let isMuted = localStorage.getItem('appMuted') === 'true';
         let alarmIntervalId = null;
         let alarmTimeoutId = null;
-        let wakeLock = null;
 
-        // Render States
         document.getElementById('glass-count').innerText = glassCount;
         document.getElementById('interval-display').innerText = reminderIntervalMins;
         updateMuteUI();
@@ -147,20 +152,19 @@
             document.getElementById('ios-tip').classList.remove('hidden');
         }
 
-        // --- NEW MODULATION CORE: DURATION CONTROLLER ---
-        function changeInterval(amount, e) {
+        // --- DYNAMIC FREQUENCY MATRIX ---
+        function adjustInterval(amount, e) {
             if(e) e.stopPropagation();
-            reminderIntervalMins = Math.max(5, Math.min(180, reminderIntervalMins + amount)); // Cap between 5 mins and 3 hours
+            reminderIntervalMins = Math.max(1, Math.min(360, reminderIntervalMins + amount)); // Limit 1m to 6h
             localStorage.setItem('reminderIntervalMins', reminderIntervalMins);
             document.getElementById('interval-display').innerText = reminderIntervalMins;
             
-            // Re-sync clock timelines immediately
             setNextTargetTime();
             syncUI();
-            showPersonalizedToast(`Reminder interval set to ${reminderIntervalMins} minutes, Vishali! ⏱️`);
+            showPersonalizedToast(`Reminder intervals re-calibrated to ${reminderIntervalMins}m! ⏱️`);
         }
 
-        // --- NATIVE AUDIO CONTROLS ---
+        // --- HARDWARE SOUND SYNTHESIS ---
         function unlockAudioContext() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -176,25 +180,26 @@
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            const osc1 = audioCtx.createOscillator();
-            const gain1 = audioCtx.createGain();
-            osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(587.33, now); 
-            osc1.frequency.exponentialRampToValueAtTime(1318.51, now + 0.1); 
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(659.25, now); // E5
+            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.08); // Snap to E6
             
-            gain1.gain.setValueAtTime(0.2, now);
-            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
             
-            osc1.connect(gain1);
-            gain1.connect(audioCtx.destination);
-            osc1.start(now);
-            osc1.stop(now + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
         }
 
-        function triggerVibrationEngine() {
-            // Native inline vibration pattern [vibrate, pause, vibrate] 
+        // --- HARDWARE BACKGROUND HAPTIC SYSTEM ---
+        function executeHapticVibration() {
             if ('vibrate' in navigator) {
-                navigator.vibrate([400, 200, 400, 200, 600]);
+                // Persistent Triple-Pulse Shockwave Pattern [vibrate, pause...]
+                navigator.vibrate([500, 250, 500, 250, 800]);
             }
         }
 
@@ -204,14 +209,14 @@
             document.getElementById('silence-btn').classList.remove('hidden');
             
             playDropletChime();
-            triggerVibrationEngine();
+            executeHapticVibration();
 
             alarmIntervalId = setInterval(() => { 
                 playDropletChime(); 
-                triggerVibrationEngine();
-            }, 2500);
+                executeHapticVibration();
+            }, 2500); // Pulse alert every 2.5s loop
             
-            alarmTimeoutId = setTimeout(() => { stopLongAlarm(); }, 60000);
+            alarmTimeoutId = setTimeout(() => { stopLongAlarm(); }, 60000); // Auto cutoff at 1 minute
         }
 
         function stopLongAlarm(e) {
@@ -219,6 +224,7 @@
             if (alarmIntervalId) { clearInterval(alarmIntervalId); alarmIntervalId = null; }
             if (alarmTimeoutId) { clearTimeout(alarmTimeoutId); alarmTimeoutId = null; }
             document.getElementById('silence-btn').classList.add('hidden');
+            if ('vibrate' in navigator) navigator.vibrate(0); // Explicitly cancel physical motor spin
         }
 
         function toggleMute(e) {
@@ -234,31 +240,7 @@
             icon.className = isMuted ? "fa-solid fa-volume-xmark text-rose-500" : "fa-solid fa-volume-high text-emerald-500";
         }
 
-        // --- DEEP RE-WAKE LOCK MECHANICS ---
-        async function toggleWakeLock(e) {
-            if(e) e.stopPropagation();
-            const btn = document.getElementById('wake-lock-btn');
-            if (wakeLock !== null) {
-                await wakeLock.release();
-                wakeLock = null;
-                btn.className = "bg-slate-200 text-slate-600 font-bold px-3 py-1 rounded-lg transition active:scale-95";
-                btn.innerText = "OFF";
-                showPersonalizedToast("Desk Mode disabled.");
-            } else {
-                try {
-                    if ('wakeLock' in navigator) {
-                        wakeLock = await navigator.wakeLock.request('screen');
-                        btn.className = "bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow-sm animate-pulse";
-                        btn.innerText = "ON";
-                        showPersonalizedToast("Desk Mode active! Screen will stay on. ☀️");
-                    } else {
-                        alert("Screen Wake Lock API unsupported on this browser client.");
-                    }
-                } catch (err) { console.error(err); }
-            }
-        }
-
-        // --- ATOMIC CLOCK CALCULATIONS (Freeze Proof) ---
+        // --- WALL-CLOCK TIMELINE INTERCEPT ---
         function setNextTargetTime() {
             const targetTimestamp = Date.now() + (reminderIntervalMins * 60 * 1000);
             localStorage.setItem('hydrationTargetTime', targetTimestamp);
@@ -272,8 +254,7 @@
             if (timeLeftMs <= 0) {
                 triggerReminder();
                 setNextTargetTime();
-                const newTarget = parseInt(localStorage.getItem('hydrationTargetTime'));
-                updateVisualCountdown(newTarget - now);
+                updateVisualCountdown(parseInt(localStorage.getItem('hydrationTargetTime')) - now);
             } else {
                 updateVisualCountdown(timeLeftMs);
             }
@@ -296,6 +277,7 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
+        // Handle physical background re-wake intercepts
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 syncUI();
@@ -317,17 +299,18 @@
             }
         }
 
-        // --- SYSTEM BACKGROUND PUSH AND VIBRATION COUPLING ---
+        // --- SYSTEM OS INTER-PROCESS NOTIFICATIONS ---
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
-                alert('Notification APIs are turned off or unsupported on this device.');
+                alert('Web System Push notifications are locked or unsupported on this native client.');
                 return;
             }
             Notification.requestPermission().then(permission => {
                 updateNotificationButton(permission);
                 if (permission === 'granted') {
                     playDropletChime();
-                    showPersonalizedToast("Woohoo! Notifications are active, Vishali. 🔔");
+                    executeHapticVibration();
+                    showPersonalizedToast("System core sync active, Vishali! 🔔");
                 }
             });
         }
@@ -335,11 +318,11 @@
         function updateNotificationButton(permission) {
             const btn = document.getElementById('noti-btn');
             if (permission === 'granted') {
-                btn.className = "w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-md pointer-events-none flex items-center justify-center gap-2 text-sm";
-                btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Push Reminders Active`;
+                btn.className = "w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-md pointer-events-none flex items-center justify-center gap-2 text-xs tracking-wider";
+                btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Background Engine Active`;
             } else if (permission === 'denied') {
-                btn.className = "w-full bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-md text-sm";
-                btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Notifications Blocked`;
+                btn.className = "w-full bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-md text-xs tracking-wider";
+                btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Alerts Blocked By Device`;
             }
         }
 
@@ -348,11 +331,9 @@
             const message = forcedMessage || personalizedToasts[Math.floor(Math.random() * personalizedToasts.length)];
             
             const toast = document.createElement('div');
-            toast.className = "toast-animation bg-slate-900 text-white font-medium p-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800 pointer-events-auto mb-3 text-sm";
+            toast.className = "toast-animation bg-slate-900 text-white font-medium p-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800 pointer-events-auto mb-3 text-xs";
             toast.innerHTML = `
-                <div class="bg-sky-500 p-2 rounded-xl text-white">
-                    <i class="fa-solid fa-heart animate-pulse"></i>
-                </div>
+                <div class="bg-sky-500 p-2 rounded-xl text-white"><i class="fa-solid fa-heart animate-pulse"></i></div>
                 <div>${message}</div>
             `;
             container.appendChild(toast);
@@ -362,51 +343,66 @@
         function triggerReminder() {
             showPersonalizedToast();
             startLongAlarm();
-            executeNativePush();
+            executeNativeSystemPush();
         }
 
         function triggerTestReminder() {
             showPersonalizedToast();
             startLongAlarm();
-            executeNativePush("Test Notification! 💧", "Hey Vishali! Your outside-app push and vibration patterns are running beautifully.");
+            executeNativeSystemPush("Hardware Haptic Trigger! 💧", "Hey Vishali! Verifying push notification and physical vibration sequences.");
         }
 
-        function executeNativePush(title = "Time to Drink Water, Vishali! 💧", body = "Take a break, stretch, and finish a fresh glass of water right now.") {
+        function executeNativeSystemPush(title = "Time to Drink Water, Vishali! 💧", body = "Take a break, stretch, and finish a fresh glass of water right now.") {
             if (Notification.permission === "granted") {
-                const pushOptions = {
+                const systemManifestOptions = {
                     body: body,
                     icon: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png",
                     badge: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png",
-                    // CRITICAL: This is the vibration specification array mapped directly into the system wrapper kernel
-                    // It commands the physical hardware device engine to pulse outside of the browser window pipeline.
-                    vibrate: [400, 200, 400, 200, 600],
-                    tag: 'hydration-vibe-alert',
-                    renotify: true
+                    
+                    // CRITICAL CONFIGURATION FOR OUTSIDE-APP IMMERSION:
+                    // This pattern map requests the OS kernel to physically pulse the internal vibration motor
+                    // when the system notification frame drops down outside the active browser layout window.
+                    vibrate: [500, 250, 500, 250, 800],
+                    tag: 'hydration-core-alarm',
+                    renotify: true,
+                    requireInteraction: true // Keeps notification visible on desktop/Android until addressed
                 };
 
+                // Route through the system background thread worker if active
                 if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.ready.then(registration => {
-                        registration.showNotification(title, pushOptions);
+                        registration.showNotification(title, systemManifestOptions);
                     });
                 } else {
-                    new Notification(title, pushOptions);
+                    new Notification(title, systemManifestOptions);
                 }
             }
         }
 
-        // --- CORE PWA SERVICE WORKER WITH INTER-PROCESS NOTIFICATION ABILITIES ---
+        // --- ADVANCED BACKGROUND SERVICE WORKER ROUTINES ---
         if ('serviceWorker' in navigator) {
             const swCode = `
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
                 self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                
+                // Native background hook to capture incoming out-of-app clicks
+                self.addEventListener('notificationclick', e => {
+                    e.notification.close();
+                    e.waitUntil(
+                        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+                            if (clientList.length > 0) return clientList[0].focus();
+                            return clients.openWindow('.');
+                        })
+                    );
+                });
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
             const swUrl = URL.createObjectURL(blob);
             navigator.serviceWorker.register(swUrl).catch(err => console.error(err));
         }
 
-        // Bootstrapping Engine
+        // Initialize Timing Trackers
         runClockEngine();
     </script>
 </body>
