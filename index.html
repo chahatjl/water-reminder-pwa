@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vishali's Hydration Companion</title>
     
-    <!-- Apple/iOS Web App System Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vishali Drips">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3105/3105803.png">
 
-    <!-- PWA Web Manifest Configuration -->
     <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Vishali's%20Hydration%20Reminder%22%2C%22short_name%22%3A%22VishaliHydrates%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0fdfa%22%2C%22theme_color%22%3A%22%230ea5e9%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3105%2F3105803.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%23png%22%7D%5D%7D">
     <meta name="theme-color" content="#0ea5e9">
     
-    <!-- Design & Typography Engines -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -37,7 +34,6 @@
 </head>
 <body class="bg-gradient-to-br from-sky-50 to-blue-100 min-h-screen font-sans flex flex-col items-center justify-between p-4 selection:bg-sky-200" onclick="unlockAudioContext()">
 
-    <!-- App Bar -->
     <header class="w-full max-w-md text-center pt-4 relative">
         <button id="sound-btn" onclick="toggleMute(event)" class="absolute right-2 top-4 bg-white/80 backdrop-blur-sm text-sky-600 shadow-sm border border-sky-100 w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition">
             <i id="sound-icon" class="fa-solid fa-volume-high"></i>
@@ -48,10 +44,8 @@
         </h1>
     </header>
 
-    <!-- Main Deck -->
     <main class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-5 shadow-xl border border-sky-100 flex flex-col items-center space-y-4 my-auto">
         
-        <!-- Interactive Timer Control Deck -->
         <div class="w-full bg-white/90 border border-sky-100 rounded-2xl p-3 flex flex-col items-center space-y-1 shadow-sm">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Set Alert Frequency</span>
             <div class="flex items-center justify-center gap-5">
@@ -68,23 +62,19 @@
             </div>
         </div>
 
-        <!-- Center Fluid Display -->
         <div class="relative w-28 h-28 bg-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-inner animate-wave">
             <i class="fa-solid fa-glass-water text-5xl text-sky-500"></i>
         </div>
 
-        <!-- Live Clock Matrix -->
         <div class="text-center w-full">
             <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Countdown Intercept</p>
             <p id="countdown" class="text-4xl font-mono font-black text-slate-700 tracking-tight mt-0.5">60:00</p>
         </div>
 
-        <!-- System Reset Execution Button -->
         <button id="silence-btn" onclick="stopLongAlarm(event)" class="hidden w-full bg-rose-500 hover:bg-rose-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg transition animate-pulse flex items-center justify-center gap-2 text-sm">
             <i class="fa-solid fa-circle-stop text-lg"></i> Stop Alarm Notification, Vishali!
         </button>
 
-        <!-- Metrics Dashboard -->
         <div class="bg-sky-50/60 rounded-2xl p-3 w-full text-center border border-sky-100/40">
             <p class="text-[11px] font-bold uppercase tracking-wider text-sky-800">Target Volume Log</p>
             <div class="flex items-center justify-center gap-6 mt-1">
@@ -94,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Security Permission Controllers -->
         <div class="w-full space-y-1.5">
             <button id="noti-btn" onclick="requestNotificationPermission()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
                 <i class="fa-solid fa-bell"></i> Authorize Background Push Engine
@@ -105,7 +94,6 @@
             </button>
         </div>
 
-        <!-- iOS Hardware Trap Warning Box -->
         <div id="ios-tip" class="hidden text-left bg-blue-50 border border-blue-200 rounded-xl p-3 text-[11px] text-blue-800 space-y-1">
             <p class="font-bold"><i class="fa-solid fa-circle-info"></i> iPhone Deployment Requirement:</p>
             <p>Tap <span class="font-bold">Share <i class="fa-solid fa-share-from-square"></i></span>, then choose <span class="font-bold">"Add to Home Screen"</span>. Launch that icon to activate background execution routines.</p>
@@ -117,7 +105,6 @@
         ENGINEERED WITH ❤️ FOR VISHALI
     </footer>
 
-    <!-- Haptic Custom Toast Stack -->
     <div id="toast-container" class="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-sm z-50 pointer-events-none"></div>
 
     <script>
@@ -155,7 +142,7 @@
         // --- DYNAMIC FREQUENCY MATRIX ---
         function adjustInterval(amount, e) {
             if(e) e.stopPropagation();
-            reminderIntervalMins = Math.max(1, Math.min(360, reminderIntervalMins + amount)); // Limit 1m to 6h
+            reminderIntervalMins = Math.max(1, Math.min(360, reminderIntervalMins + amount)); 
             localStorage.setItem('reminderIntervalMins', reminderIntervalMins);
             document.getElementById('interval-display').innerText = reminderIntervalMins;
             
@@ -164,7 +151,7 @@
             showPersonalizedToast(`Reminder intervals re-calibrated to ${reminderIntervalMins}m! ⏱️`);
         }
 
-        // --- HARDWARE SOUND SYNTHESIS ---
+        // --- HARDWARE SOUND SYNTHESIS (UPGRADED HIGH-VOLUME ENGINE) ---
         function unlockAudioContext() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -180,25 +167,40 @@
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(659.25, now); // E5
-            osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.08); // Snap to E6
             
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            // Channel 1: High-amplitude piercing crisp fundamental wave
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(880, now); // Higher clear A5 note
+            osc1.frequency.exponentialRampToValueAtTime(440, now + 0.3); // Linear drop curve
             
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 0.25);
+            gain1.gain.setValueAtTime(1.0, now); // Max structural web audio volume (100% capacity)
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+            
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.45);
+
+            // Channel 2: Rich bright harmonizing wave to cut through device chassis noise
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'triangle'; // Resonant body structure
+            osc2.frequency.setValueAtTime(1320, now); // High E6 harmonic ring
+            
+            gain2.gain.setValueAtTime(0.6, now); // Boosted supplemental overlay volume
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start(now);
+            osc2.stop(now + 0.35);
         }
 
         // --- HARDWARE BACKGROUND HAPTIC SYSTEM ---
         function executeHapticVibration() {
             if ('vibrate' in navigator) {
-                // Persistent Triple-Pulse Shockwave Pattern [vibrate, pause...]
                 navigator.vibrate([500, 250, 500, 250, 800]);
             }
         }
@@ -214,9 +216,9 @@
             alarmIntervalId = setInterval(() => { 
                 playDropletChime(); 
                 executeHapticVibration();
-            }, 2500); // Pulse alert every 2.5s loop
+            }, 2000); // Tighter sounding sequence pulse loop every 2 seconds
             
-            alarmTimeoutId = setTimeout(() => { stopLongAlarm(); }, 60000); // Auto cutoff at 1 minute
+            alarmTimeoutId = setTimeout(() => { stopLongAlarm(); }, 60000); 
         }
 
         function stopLongAlarm(e) {
@@ -224,7 +226,7 @@
             if (alarmIntervalId) { clearInterval(alarmIntervalId); alarmIntervalId = null; }
             if (alarmTimeoutId) { clearTimeout(alarmTimeoutId); alarmTimeoutId = null; }
             document.getElementById('silence-btn').classList.add('hidden');
-            if ('vibrate' in navigator) navigator.vibrate(0); // Explicitly cancel physical motor spin
+            if ('vibrate' in navigator) navigator.vibrate(0); 
         }
 
         function toggleMute(e) {
@@ -277,7 +279,6 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Handle physical background re-wake intercepts
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 syncUI();
@@ -358,17 +359,12 @@
                     body: body,
                     icon: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png",
                     badge: "https://cdn-icons-png.flaticon.com/512/3105/3105803.png",
-                    
-                    // CRITICAL CONFIGURATION FOR OUTSIDE-APP IMMERSION:
-                    // This pattern map requests the OS kernel to physically pulse the internal vibration motor
-                    // when the system notification frame drops down outside the active browser layout window.
                     vibrate: [500, 250, 500, 250, 800],
                     tag: 'hydration-core-alarm',
                     renotify: true,
-                    requireInteraction: true // Keeps notification visible on desktop/Android until addressed
+                    requireInteraction: true 
                 };
 
-                // Route through the system background thread worker if active
                 if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.ready.then(registration => {
                         registration.showNotification(title, systemManifestOptions);
@@ -379,14 +375,13 @@
             }
         }
 
-        // --- ADVANCED BACKGROUND SERVICE WORKER ROUTINES ---
+        // --- BACKGROUND SERVICE WORKER ROUTINES ---
         if ('serviceWorker' in navigator) {
             const swCode = `
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
                 self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
                 
-                // Native background hook to capture incoming out-of-app clicks
                 self.addEventListener('notificationclick', e => {
                     e.notification.close();
                     e.waitUntil(
